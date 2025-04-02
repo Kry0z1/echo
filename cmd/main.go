@@ -6,6 +6,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 
+	"github.com/Kry0z1/echo/internal/auth"
 	"github.com/Kry0z1/echo/internal/database"
 )
 
@@ -13,6 +14,7 @@ func init() {
 	godotenv.Load()
 
 	database.Init()
+	auth.Init()
 }
 
 func main() {
