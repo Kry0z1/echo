@@ -46,6 +46,7 @@ func main() {
 	}, handlers.CheckToken)
 	e.POST("/login", handlers.LoginForAccessToken)
 	e.POST("/signup", handlers.CreateUser)
+	e.POST("/task/create", handlers.CreateTask, handlers.CheckToken)
 
 	e.Logger.Fatal(e.Start(":21000"))
 }

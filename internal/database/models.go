@@ -26,11 +26,12 @@ func (UserStored) TableName() string {
 
 type TaskBase struct {
 	Title       string `json:"title"`
-	Priority    int    `json:"priority"`
+	Priority    int    `json:"priority"` // [0, 3]
 	Description string `json:"description"`
 	UserID      int    `json:"user_id"`
 	StartsAt    int    `json:"starts_at"`
 	DueTo       int    `json:"due_to"`
+	Done        bool   `json:"done"`
 }
 
 type TaskIn TaskBase
@@ -40,7 +41,9 @@ type TaskOut struct {
 	ID int
 }
 
-type TaskStored TaskOut
+type TaskStored struct {
+	TaskOut
+}
 
 func (TaskStored) TableName() string {
 	return "tasks"

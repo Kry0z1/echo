@@ -20,7 +20,13 @@ type TokenIn struct {
 	token string
 }
 
-var CredError = errors.New("Invalid credentials")
+func ContextUser(ctx echo.Context) *database.UserOut {
+	user := ctx.Get("contextUser")
+	if user == nil {
+		return nil
+	}
+	return user.(*database.UserOut)
+}
 
 func LoginForAccessToken(ctx echo.Context) error {
 	var user database.UserIn
@@ -35,7 +41,7 @@ func LoginForAccessToken(ctx echo.Context) error {
 		return nil
 	}
 
-	token, err := auth.CreateAuthToken(user.Username, time.Minute)
+	token, err := auth.CreateAuthToken(user.Username, time.Hour*72)
 	if err != nil {
 		return err
 	}
@@ -81,7 +87,7 @@ func CheckToken(next echo.HandlerFunc) echo.HandlerFunc {
 			return err
 		}
 
-		ctx.Set("contextUser", user.UserBase)
+		ctx.Set("contextUser", &user.UserOut)
 		return next(ctx)
 	}
 }
