@@ -46,3 +46,15 @@ func GetUserByUsername(username string) (UserStored, error) {
 	err := db.First(&user, "username=?", username).Error
 	return user, err
 }
+
+func GetTasksForUser(id int) ([]TaskStored, error) {
+	var tasks []TaskStored
+	err := db.Find(&tasks, "user_id=?", id).Error
+	return tasks, err
+}
+
+func GetDoneTasksForUser(id int) ([]TaskStored, error) {
+	var tasks []TaskStored
+	err := db.Find(&tasks, "user_id=? and done=true", id).Error
+	return tasks, err
+}
