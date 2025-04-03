@@ -9,10 +9,12 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
+var ErrInvalidToken = errors.New("Invalid token")
+
 func AuthUser(username, password string) (db.UserStored, bool) {
 	user, err := db.GetUserByUsername(username)
 
-	return user, err != nil && !internal.VerifyPassword(password, user.HashedPassword)
+	return user, err == nil && internal.VerifyPassword(password, user.HashedPassword)
 }
 
 func CreateAuthToken(username string, exp time.Duration) (string, error) {
@@ -31,26 +33,25 @@ func CreateAuthToken(username string, exp time.Duration) (string, error) {
 }
 
 func CheckAuthToken(token string) (db.UserStored, error) {
-	credentialsError := errors.New("invalid credentials")
 
 	t, err := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
 		return secretKey, nil
 	})
 
 	if err != nil {
-		return db.UserStored{}, err
+		return db.UserStored{}, ErrInvalidToken
 	}
 
 	claims := t.Claims.(jwt.MapClaims)
 
 	username := claims["sub"].(string)
 	if username == "" {
-		return db.UserStored{}, credentialsError
+		return db.UserStored{}, ErrInvalidToken
 	}
 
 	user, err := db.GetUserByUsername(username)
 	if err != nil {
-		return db.UserStored{}, credentialsError
+		return db.UserStored{}, err
 	}
 	return user, nil
 }
