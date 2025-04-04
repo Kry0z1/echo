@@ -38,7 +38,7 @@ type TaskIn TaskBase
 
 type TaskOut struct {
 	TaskBase
-	ID int
+	ID int `json:"id"`
 }
 
 type TaskStored struct {

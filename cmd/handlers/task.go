@@ -85,5 +85,46 @@ func GetTasksForUser(ctx echo.Context) error {
 		return res
 	})
 
-	return ctx.JSON(http.StatusOK, tasks)
+	result := make([]database.TaskOut, len(tasks))
+	for i, task := range tasks {
+		result[i] = task.TaskOut
+	}
+
+	return ctx.JSON(http.StatusOK, result)
+}
+
+func UpdateTask(ctx echo.Context) error {
+	var task database.TaskStored
+	user := ContextUser(ctx)
+
+	err := ctx.Bind(&task)
+
+	if err != nil {
+		ctx.String(http.StatusBadRequest, "Invalid format")
+		return nil
+	}
+
+	taskStored, err := database.GetTask(task.ID)
+
+	if err != nil {
+		ctx.String(http.StatusNotFound, "Task with such id does not exists")
+		return nil
+	}
+
+	if taskStored.UserID != task.UserID {
+		ctx.String(http.StatusUnauthorized, "Cannot update creator id")
+		return nil
+	}
+
+	if taskStored.UserID != user.ID {
+		ctx.String(http.StatusUnauthorized, "Cannot update tasks for other users")
+		return nil
+	}
+
+	err = database.UpdateTask(&task)
+	if err != nil {
+		return err
+	}
+
+	return ctx.JSON(http.StatusOK, task.TaskOut)
 }

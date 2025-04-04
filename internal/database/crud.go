@@ -34,6 +34,11 @@ func CreateTask(task TaskIn) (TaskStored, error) {
 	return taskStored, err
 }
 
+func UpdateTask(task *TaskStored) error {
+	err := db.Save(task).Error
+	return err
+}
+
 func GetUser(id int) (UserStored, error) {
 	var user UserStored
 	user.ID = id
@@ -45,6 +50,13 @@ func GetUserByUsername(username string) (UserStored, error) {
 	var user UserStored
 	err := db.First(&user, "username=?", username).Error
 	return user, err
+}
+
+func GetTask(id int) (TaskStored, error) {
+	var task TaskStored
+	task.ID = id
+	err := db.First(&task).Error
+	return task, err
 }
 
 func GetTasksForUser(id int) ([]TaskStored, error) {
