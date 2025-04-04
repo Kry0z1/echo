@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/Kry0z1/echo/internal/database"
@@ -127,4 +128,38 @@ func UpdateTask(ctx echo.Context) error {
 	}
 
 	return ctx.JSON(http.StatusOK, task.TaskOut)
+}
+
+func RemoveTask(ctx echo.Context) error {
+	id, err := strconv.Atoi(ctx.QueryParam("id"))
+	user := ContextUser(ctx)
+
+	if err != nil {
+		ctx.String(http.StatusBadRequest, "Bad id")
+		return nil
+	}
+
+	if id == 0 {
+		ctx.String(http.StatusBadRequest, "Missing id")
+		return nil
+	}
+
+	task, err := database.GetTask(id)
+
+	if err != nil {
+		ctx.String(http.StatusNotFound, "Task is not found")
+		return nil
+	}
+
+	if task.UserID != user.ID {
+		ctx.String(http.StatusUnauthorized, "Cannot remove tasks if other users")
+		return nil
+	}
+
+	err = database.RemoveTask(id)
+	if err != nil {
+		return err
+	}
+
+	return ctx.String(http.StatusOK, "")
 }

@@ -50,6 +50,7 @@ func main() {
 	e.POST("/task/create", handlers.CreateTask, handlers.CheckToken)
 	e.POST("/task/update", handlers.UpdateTask, handlers.CheckToken)
 	e.GET("/tasks", handlers.GetTasksForUser, handlers.CheckToken)
+	e.DELETE("/task/delete", handlers.RemoveTask, handlers.CheckToken)
 
 	e.Logger.Fatal(e.Start(":21000"))
 }

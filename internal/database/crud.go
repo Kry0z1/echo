@@ -70,3 +70,7 @@ func GetDoneTasksForUser(id int) ([]TaskStored, error) {
 	err := db.Find(&tasks, "user_id=? and done=true", id).Error
 	return tasks, err
 }
+
+func RemoveTask(id int) error {
+	return db.Delete(&TaskStored{}, "id=?", id).Error
+}
